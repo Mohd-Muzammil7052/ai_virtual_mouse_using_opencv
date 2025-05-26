@@ -24,11 +24,15 @@ def detect_gestures(frame,lmlist,angle_ind,angle_mid,dist_thumb):
         index_tip_raw = [lmlist[8][1], lmlist[8][2]]  # raw pixel coordinates
         f_h, f_w = frame.shape[0], frame.shape[1]
 
-        # Normalize to [0, 1]
-        index_tip = [
-            index_tip_raw[0] / f_w,
-            index_tip_raw[1] / f_h
-        ]
+        # Normalize only within active region
+        active_w = 400  
+        active_h = 240  
+
+        # Clamp to active region
+        x = np.clip(index_tip_raw[0], 100, 500) - 100
+        y = np.clip(index_tip_raw[1], 100, 340) - 100
+
+        index_tip = [x / active_w, y / active_h]
 
         if dist_thumb < 50 and angle_ind > 150:
             # print(dist_thumb, angle_ind)
@@ -79,6 +83,7 @@ while True:
     ret, frame = cap.read()
     frame = cv2.flip(frame,1)
     frame = cv2.resize(frame,(640,640))
+    frame = cv2.rectangle(frame, (100, 100), (500, 340), (255, 0, 0), 2)
     f_h = frame.shape[0]
     f_w = frame.shape[1]
 
