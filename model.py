@@ -32,6 +32,9 @@ def detect_gestures(frame,lmlist,angle_ind,angle_mid,dist_thumb):
 
         if dist_thumb < 50 and angle_ind > 150:
             # print(dist_thumb, angle_ind)
+            x1,y1 = index_tip_raw[0],index_tip_raw[1]
+            cv2.circle(frame,(x1,y1),15,(255,255,255),cv2.FILLED)
+            cv2.putText(frame,"Mouse Moving",(50,50),cv2.FONT_HERSHEY_COMPLEX,1.0,(0,0,255),3)
             move_mouse(index_tip)
 
         # left click
@@ -57,6 +60,9 @@ def detect_gestures(frame,lmlist,angle_ind,angle_mid,dist_thumb):
             label = random.randint(1,1000)
             ss.save(f'my_screenshot_{label}.png')
             cv2.putText(frame,"Screen Shot",(50,50),cv2.FONT_HERSHEY_COMPLEX,1.0,(0,0,255),3)
+        
+        else:
+            cv2.putText(frame,"Mouse Idle",(50,50),cv2.FONT_HERSHEY_COMPLEX,1.0,(0,0,255),3)
 
 def calculate_angle(p1,p2,p3):
     radians = np.arctan2(p3[1] - p2[1],p3[0] - p2[0]) - np.arctan2(p1[1] - p2[1],p1[0] - p2[0])
@@ -69,8 +75,6 @@ def calculate_distance(p1, p2):
     length = np.interp(length, (0, max_distance), (0, 1000))
     return length
 
-
-
 while True:
     ret, frame = cap.read()
     frame = cv2.flip(frame,1)
@@ -79,7 +83,7 @@ while True:
     f_w = frame.shape[1]
 
     frame = detector.handdetect(frame)
-    lmlist = detector.findpos(frame,draw=False) 
+    lmlist,bbox = detector.findpos(frame,draw=True) 
 
     if len(lmlist) != 0:
 
